@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sylvan — 沉积的文字、影像与足迹</title>
+<meta name="description" content="Sylvan 沉淀站。沉积的文字、影像与足迹。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Cormorant+SC:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment:#E8DCC0;
+    --parchment-deep:#D9C9A4;
+    --parchment-edge:#C5B188;
+    --ink:#2A2418;
+    --ink-soft:#4D4234;
+    --ink-faint:#897B5F;
+    --sepia:#7A4A1F;
+    --teal:#2A6470;
+    --teal-soft:#3F8090;
+    --rust:#9C4F2A;
+    --max:1200px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--parchment);color:var(--ink);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{
+    font-family:"Source Serif 4","Source Serif Pro",Georgia,serif;font-size:17px;line-height:1.75;font-feature-settings:"kern" 1,"liga" 1;
+    background-image:
+      radial-gradient(ellipse 800px 600px at 50% 30%,transparent 0,rgba(42,36,24,.04) 100%),
+      repeating-linear-gradient(0deg,transparent 0,transparent 119px,rgba(42,36,24,.04) 119px,rgba(42,36,24,.04) 120px),
+      repeating-linear-gradient(90deg,transparent 0,transparent 119px,rgba(42,36,24,.04) 119px,transparent 120px);
+  }
+  ::selection{background:var(--teal);color:var(--parchment)}
+  a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink);text-underline-offset:4px}
+  a:hover{border-bottom-color:var(--rust);color:var(--rust)}
+  img{display:block;max-width:100%;height:auto}
+
+  /* ─── Topographic line decoration (SVG) ─── */
+  .topo{position:absolute;pointer-events:none;opacity:.12}
+
+  /* ─── Dynamic Island Header ─── */
+  .island{
+    position:fixed;top:24px;left:50%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:20px;
+    padding:10px 22px;
+    background:rgba(232,220,192,.62);
+    backdrop-filter:blur(20px) saturate(140%);
+    -webkit-backdrop-filter:blur(20px) saturate(140%);
+    border:1px solid rgba(42,36,24,.28);
+    border-radius:999px;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.05em;
+    color:var(--ink-soft);
+    transition:all .55s cubic-bezier(.16,1,.3,1);
+    z-index:100;white-space:nowrap;
+  }
+  .island.on-hero{padding:8px 16px;font-size:10px;background:rgba(232,220,192,.3);top:14px}
+  .island.scrolled{padding:8px 16px;font-size:10px;background:rgba(232,220,192,.82)}
+  .island .mark{font-family:"Cormorant SC",serif;font-weight:500;font-size:14px;letter-spacing:.18em;color:var(--ink);text-transform:uppercase}
+  .island .coord{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--teal);letter-spacing:.08em;padding-left:8px;border-left:1px solid rgba(42,36,24,.25)}
+  .island .sep{width:1px;height:12px;background:rgba(42,36,24,.3)}
+  .island nav{display:flex;gap:14px}
+  .island nav a{border-bottom:none;font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.1em;transition:color .25s ease}
+  .island nav a:hover{color:var(--rust)}
+  .island .here{display:inline-flex;align-items:center;gap:6px;opacity:0;max-width:0;overflow:hidden;color:var(--teal);transition:all .4s ease}
+  .island.scrolled .here,.island.expanded .here{opacity:1;max-width:140px}
+  .island.scrolled nav,.island.on-hero nav{max-width:0;overflow:hidden;gap:0;transition:max-width .35s ease}
+  .island.expanded nav{max-width:600px}
+
+  /* ─── Hero ─── */
+  .hero{
+    min-height:100vh;min-height:100svh;
+    padding:140px 48px 100px;
+    max-width:var(--max);margin:0 auto;
+    display:grid;grid-template-columns:1fr auto;gap:80px;align-items:center;
+    position:relative;
+  }
+  .hero-left{padding-right:40px}
+  .meta{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.24em;color:var(--teal);text-transform:uppercase;margin-bottom:32px;display:flex;gap:18px;align-items:center}
+  .meta::before{content:"";width:24px;height:1px;background:var(--teal)}
+  .signature{
+    font-family:"Cormorant SC",serif;
+    font-weight:500;
+    font-size:clamp(72px,10vw,150px);
+    line-height:.95;
+    letter-spacing:.04em;
+    color:var(--ink);
+    text-transform:uppercase;
+    margin-bottom:36px;
+  }
+  .atmospheric{
+    font-family:"Source Serif 4",serif;
+    font-style:italic;font-weight:400;
+    font-size:clamp(18px,2vw,24px);
+    line-height:1.6;color:var(--ink-soft);
+    max-width:560px;
+    margin-bottom:80px;
+  }
+  .atmospheric strong{font-style:normal;font-weight:600;color:var(--ink);border-bottom:1px solid var(--teal);padding-bottom:1px}
+
+  /* Compass SVG block on right */
+  .compass{width:240px;height:240px;display:flex;align-items:center;justify-content:center;position:relative}
+  .compass svg{width:100%;height:100%;animation:spin 80s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ─── Two entries ─── */
+  .entries{
+    display:grid;grid-template-columns:1fr 1fr;gap:0;
+    max-width:1000px;margin:0 auto;
+    border:1px solid var(--ink);
+    background:rgba(232,220,192,.5);
+  }
+  .entry{
+    padding:40px 36px 36px;
+    display:flex;flex-direction:column;gap:14px;
+    position:relative;
+  }
+  .entry:nth-child(2){border-left:1px solid var(--ink)}
+  .entry .num{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.2em;color:var(--rust);text-transform:uppercase;display:flex;align-items:center;gap:8px}
+  .entry .num::after{content:"";flex:1;height:1px;background:var(--ink-faint);opacity:.4}
+  .entry h2{font-family:"Cormorant SC",serif;font-weight:500;font-size:42px;line-height:1.1;letter-spacing:.02em;color:var(--ink);text-transform:uppercase}
+  .entry h2 em{font-style:italic;font-family:"Source Serif 4",serif;text-transform:none;font-weight:400;font-size:22px;color:var(--ink-soft);display:block;margin-top:6px;letter-spacing:0}
+  .entry .desc{font-size:15.5px;color:var(--ink-soft);line-height:1.65;max-width:38ch}
+  .entry .stats{display:flex;flex-wrap:wrap;gap:10px 14px;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ink-faint);text-transform:uppercase;margin-top:2px}
+  .entry .stats span{display:inline-flex;align-items:center;gap:5px}
+  .entry .stats span::before{content:"◇";color:var(--teal);font-size:8px}
+  .entry .cta{
+    margin-top:18px;display:inline-flex;align-items:center;gap:10px;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink);border-bottom:1px solid var(--ink);padding-bottom:2px;align-self:flex-start;
+    transition:gap .3s ease,color .3s ease;
+  }
+  .entry .cta:hover{gap:16px;color:var(--rust);border-bottom-color:var(--rust)}
+  .entry .cta::after{content:"→"}
+
+  /* ─── Featured ─── */
+  .featured{padding:120px 48px;max-width:var(--max);margin:0 auto}
+  .featured-head{display:flex;align-items:baseline;gap:24px;margin-bottom:64px;padding-bottom:18px;border-bottom:1px solid var(--ink)}
+  .featured-head h3{font-family:"Cormorant SC",serif;font-weight:500;font-size:28px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+  .featured-head .sub{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;color:var(--ink-faint);text-transform:uppercase;margin-left:auto}
+  .featured-head .sub strong{color:var(--teal);font-weight:500}
+
+  .article-row{display:grid;grid-template-columns:120px 1fr 160px;gap:32px;padding:32px 0;border-bottom:1px dashed rgba(42,36,24,.3);align-items:start;transition:border-color .3s ease}
+  .article-row:hover{border-bottom-color:var(--ink)}
+  .article-row .date{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--rust);text-transform:uppercase;padding-top:6px;line-height:1.6}
+  .article-row h4{font-family:"Cormorant SC",serif;font-weight:500;font-size:28px;line-height:1.15;letter-spacing:.01em;margin-bottom:10px;color:var(--ink)}
+  .article-row h4 a{border-bottom:none}
+  .article-row h4 a:hover{color:var(--rust)}
+  .article-row p{font-size:16px;line-height:1.7;color:var(--ink-soft);max-width:62ch}
+  .article-row .geo{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--teal);text-align:right;padding-top:6px;line-height:1.6}
+  .article-row .geo strong{display:block;font-family:"Cormorant SC",serif;font-weight:500;font-size:14px;color:var(--ink);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+
+  /* ─── Footer ─── */
+  footer{padding:80px 48px 60px;max-width:var(--max);margin:0 auto;border-top:1px solid var(--ink);display:flex;justify-content:space-between;align-items:baseline;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--ink-faint);text-transform:uppercase}
+  footer .sign{font-family:"Cormorant SC",serif;font-weight:500;font-size:18px;letter-spacing:.16em;color:var(--ink)}
+
+  /* ─── Responsive ─── */
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;gap:48px;padding:110px 24px 80px}
+    .hero-left{padding-right:0}
+    .compass{width:160px;height:160px;margin:0 auto}
+    .entries{grid-template-columns:1fr}
+    .entry:nth-child(2){border-left:none;border-top:1px solid var(--ink)}
+    .article-row{grid-template-columns:1fr;gap:8px}
+    .article-row .geo{text-align:left}
+    .featured{padding:80px 24px}
+    footer{padding:60px 24px 40px;flex-direction:column;gap:14px;align-items:flex-start}
+    .island .sep,.island .coord{display:none}
+  }
+
+  /* ─── Motion ─── */
+  .meta,.signature,.atmospheric,.compass,.entries,.article-row{opacity:0;transform:translateY(12px);animation:rise 1s cubic-bezier(.16,1,.3,1) forwards}
+  .meta{animation-delay:.1s}
+  .signature{animation-delay:.22s}
+  .atmospheric{animation-delay:.4s}
+  .compass{animation-delay:.55s}
+  .entries{animation-delay:.7s}
+  .article-row{animation-delay:.85s}
+  @keyframes rise{to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<header class="island on-hero" id="island">
+  <span class="mark">Sylvan</span>
+  <span class="coord">31.23°N · 121.47°E</span>
+  <span class="sep" aria-hidden="true"></span>
+  <nav aria-label="主导航">
+    <a href="#">文章</a>
+    <a href="#">旅记</a>
+    <a href="#">相册</a>
+    <a href="#">Citywalk</a>
+  </nav>
+  <span class="here" aria-live="polite">at · Home</span>
+</header>
+
+<main>
+<section class="hero">
+  <div class="hero-left">
+    <div class="meta">Atlas No.03 · Spring 2026</div>
+    <h1 class="signature">Sylvan</h1>
+    <p class="atmospheric">沉积的文字、影像与足迹。<br>在这里，时间不是钟表上的刻度——是<strong>地层</strong>。</p>
+  </div>
+
+  <div class="compass" aria-hidden="true">
+    <svg viewBox="0 0 200 200" fill="none" stroke="#2A2418" stroke-width=".8">
+      <circle cx="100" cy="100" r="90"/>
+      <circle cx="100" cy="100" r="74"/>
+      <circle cx="100" cy="100" r="50"/>
+      <circle cx="100" cy="100" r="22"/>
+      <path d="M100 10 L100 190 M10 100 L190 100 M30 30 L170 170 M170 30 L30 170" stroke-dasharray="2 4"/>
+      <path d="M100 10 L106 100 L100 190 L94 100 Z" fill="#9C4F2A" stroke="#2A2418"/>
+      <path d="M10 100 L100 94 L190 100 L100 106 Z" fill="#2A6470" stroke="#2A2418" opacity=".75"/>
+      <text x="100" y="14" text-anchor="middle" font-family="Cormorant SC, serif" font-size="10" letter-spacing="2" fill="#2A2418">N</text>
+      <text x="100" y="194" text-anchor="middle" font-family="Cormorant SC, serif" font-size="10" letter-spacing="2" fill="#2A2418">S</text>
+      <text x="14" y="103" text-anchor="middle" font-family="Cormorant SC, serif" font-size="10" letter-spacing="2" fill="#2A2418">W</text>
+      <text x="186" y="103" text-anchor="middle" font-family="Cormorant SC, serif" font-size="10" letter-spacing="2" fill="#2A2418">E</text>
+    </svg>
+  </div>
+
+  <div class="entries" style="grid-column:1/-1">
+    <article class="entry">
+      <span class="num">Section I · Articles</span>
+      <h2>文章<em>Reading &amp; Writing</em></h2>
+      <p class="desc">关于城市、关于路、关于走过的地方。慢一点的文字。</p>
+      <div class="stats"><span>5 篇</span><span>2024 — 至今</span></div>
+      <a class="cta" href="#">进入文章</a>
+    </article>
+    <article class="entry">
+      <span class="num">Section II · Footprints</span>
+      <h2>影像与足迹<em>Travel · Albums · Walks</em></h2>
+      <p class="desc">旅记、相册、citywalk。文字与影像等权。</p>
+      <div class="stats"><span>3 旅</span><span>1–2 年相册</span><span>5 citywalk</span></div>
+      <a class="cta" href="#">进入影像</a>
+    </article>
+  </div>
+</section>
+
+<section class="featured" id="featured">
+  <div class="featured-head">
+    <h3>近期 · 几篇</h3>
+    <span class="sub"><strong>03</strong> ENTRIES · LATEST</span>
+  </div>
+
+  <article class="article-row">
+    <div class="date">2026 · 03 · 14<br>SAT</div>
+    <div>
+      <h4><a href="#">在武康路走一下午</a></h4>
+      <p>从淮海中路拐进去，梧桐刚刚落完叶，午后的光打在老房子上像慢曝光。我想这是 citywalk 教给我的事——不要赶，...</p>
+    </div>
+    <div class="geo"><strong>Wukang Rd</strong>31.21°N<br>121.44°E</div>
+  </article>
+
+  <article class="article-row">
+    <div class="date">2026 · 02 · 28<br>SAT</div>
+    <div>
+      <h4><a href="#">夜里十一点的长乐路</a></h4>
+      <p>这家小书店还在。店主没抬头，把我要的那本从架子最上层抽下来递过来。城市里还有这种地方，是值得记下来的事。</p>
+    </div>
+    <div class="geo"><strong>Changle Rd</strong>31.21°N<br>121.45°E</div>
+  </article>
+
+  <article class="article-row">
+    <div class="date">2026 · 01 · 19<br>MON</div>
+    <div>
+      <h4><a href="#">关于沉淀这件事</a></h4>
+      <p>为什么不发朋友圈？为什么写在这里？大概因为这里没有点赞——只有时间。</p>
+    </div>
+    <div class="geo"><strong>Notes</strong>—</div>
+  </article>
+</section>
+</main>
+
+<footer>
+  <span class="sign">Sylvan</span>
+  <span>Scale 1 : 1 · © 2024 — 至今</span>
+</footer>
+
+<script>
+  const island = document.getElementById('island');
+  const featured = document.getElementById('featured');
+  function updateIsland(){
+    const y = window.scrollY;
+    const inHero = y < window.innerHeight * 0.6;
+    const pastFeatured = featured && y > featured.offsetTop - 200;
+    island.classList.toggle('on-hero', inHero);
+    island.classList.toggle('scrolled', !inHero && !pastFeatured);
+    const here = island.querySelector('.here');
+    if (pastFeatured) here.textContent = 'at · Recent';
+    else if (!inHero) here.textContent = 'at · Home';
+    else here.textContent = '';
+  }
+  window.addEventListener('scroll', updateIsland, {passive:true});
+  island.addEventListener('mouseenter',()=>island.classList.add('expanded'));
+  island.addEventListener('mouseleave',()=>island.classList.remove('expanded'));
+  island.addEventListener('focusin',()=>island.classList.add('expanded'));
+  island.addEventListener('focusout',()=>island.classList.remove('expanded'));
+  updateIsland();
+</script>
+
+<!--
+  PROVENANCE / 资产来源
+  ────────────────────
+  · 字体：Cormorant Garamond / Cormorant SC / Source Serif 4 / IBM Plex Mono — Google Fonts（OFL）
+  · 图片：本 mockup 未引用外部图片；罗盘 SVG 为代码生成（原创）
+  · 坐标 31.23°N · 121.47°E 为示意（上海中心），非真实定位
+  · 此文件为视觉方向 mockup，所有数据/数量为占位
+-->
+</body>
+</html>
