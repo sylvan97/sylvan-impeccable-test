@@ -1,0 +1,26 @@
+<header class="island on-hero" id="island">
+  <a class="mark" href="/" aria-label="Sylvan 首页">Sylvan</a>
+  <span class="sep" aria-hidden="true"></span>
+  <nav aria-label="主导航">
+    <a href="/articles">文章</a>
+    <a href="/travels">旅记</a>
+    <a href="/albums">相册</a>
+    <a href="/citywalks">Citywalk</a>
+  </nav>
+  <span class="here" aria-live="polite">— 主页</span>
+</header>
+
+<script>
+  const island = document.querySelector('#island');
+
+  if (island) {
+    const update = () => {
+      const scrolled = window.scrollY > 56;
+      island.classList.toggle('scrolled', scrolled);
+      island.classList.toggle('on-hero', !scrolled);
+    };
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+  }
+</script>
